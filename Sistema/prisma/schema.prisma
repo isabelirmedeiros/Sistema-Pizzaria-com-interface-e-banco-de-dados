@@ -1,0 +1,143 @@
+// Configuração do Gerador:
+// Define que o Prisma deve gerar o cliente em JavaScript/TypeScript ("prisma-client-js")
+// para que possamos usar 'prismaClient.customer.create', etc.
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Configuração da Fonte de Dados:
+// Define que estamos usando o banco de dados MongoDB ("mongodb").
+// A URL de conexão não fica "chumbada" aqui por segurança, ela é lida do arquivo .env.
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Cliente
+model Customer {
+  // ID: Configuração padrão para MongoDB no Prisma.
+  // Mapeia o campo '_id' nativo do Mongo para 'id' no código.
+  // @db.ObjectId garante que é um ID válido do Mongo.
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  cpf      String
+  email    String
+  telefone String
+  
+  // Relação 1-para-N (Um cliente pode ter vários pedidos)
+  orders   Order[]
+
+  // Define que o nome da coleção no banco será "customers" (minúsculo)
+  @@map("customers")
+}
+
+// Catálogo de Pizzas
+model Pizza {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  ingredients String
+  price       Float
+  // Relação inversa: Uma pizza pode estar em vários itens de pedido
+  orderItems  OrderItem[]
+}
+
+// Catálogo de Sobremesas
+model Sobremesa {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  ingredients String
+  price       Float
+  orderItems  OrderItem[]
+}
+
+// Catálogo de Bebidas
+model Bebida {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  price       Float
+  orderItems  OrderItem[]
+}
+
+// Enums: Definem listas fixas de valores permitidos.
+// O banco/código rejeitará qualquer valor que não esteja nestas listas.
+
+// Tipo de produto para facilitar a lógica no código
+enum ProductType {
+  PIZZA
+  SOBREMESA
+  BEBIDA
+}
+
+// Opções de pagamento
+enum PaymentMethod {
+  DINHEIRO
+  CARTAO
+  PIX
+}
+
+// Opções de entrega
+enum DeliveryMethod {
+  RETIRADA
+  ENTREGA
+}
+
+// Modelo OrderItem (Item do Pedido):
+// Esta tabela/coleção serve para ligar um Pedido a um Produto específico.
+// Como temos 3 tabelas de produtos diferentes, usamos IDs opcionais (?) para conectar.
+model OrderItem {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Chave Estrangeira ligando ao Pedido principal
+  orderId         String      @db.ObjectId
+  order           Order       @relation(fields: [orderId], references: [id])
+
+  // Campos de relacionamento opcionais.
+  // Apenas UM destes 3 será preenchido por item, dependendo do que o cliente comprou.
+  pizzaId         String?     @db.ObjectId 
+  pizza           Pizza?      @relation(fields: [pizzaId], references: [id])
+
+  sobremesaId     String?     @db.ObjectId 
+  sobremesa       Sobremesa?  @relation(fields: [sobremesaId], references: [id])
+
+  bebidaId        String?     @db.ObjectId 
+  bebida          Bebida?     @relation(fields: [bebidaId], references: [id])
+
+  // Campos de "Snapshot" (Histórico):
+  // É crucial salvar o nome e o preço NO MOMENTO da compra.
+  // Se o preço da Pizza mudar no futuro, o histórico deste pedido não será alterado.
+  productType     ProductType 
+  productName     String      
+  productPriceAtOrder Float     
+
+  quantity        Int
+  itemPrice       Float  // Subtotal (quantity * productPriceAtOrder)     
+
+  @@map("orderItems")
+}
+
+// Modelo de Pedido
+model Order {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Relacionamento com o Cliente (Obrigatório ter um cliente para criar pedido)
+  customerId    String         @db.ObjectId
+  customer      Customer       @relation(fields: [customerId], references: [id])
+  
+  totalPrice    Float          // Valor final do pedido
+  deliveryFee   Float          @default(0.0) // Taxa de entrega (Padrão 0 se não for preenchido)
+
+  // Utiliza os Enums definidos acima
+  paymentMethod PaymentMethod
+  deliveryMethod DeliveryMethod
+
+  // Timestamps:
+  // default(now()): Grava a data/hora exata da criação automaticamente.
+  // @updatedAt: Atualiza a data/hora automaticamente sempre que o pedido for editado.
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  // Relação: Um pedido contém vários itens
+  orderItems    OrderItem[]
+
+  @@map("orders")
+}
