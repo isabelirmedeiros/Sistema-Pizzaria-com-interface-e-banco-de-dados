@@ -18,8 +18,8 @@ Esse é um sistema de uma pizzaria produzido em **TypeScript, utilizando Fastify
 | **TypeScript** | 5.9.3 | Type-safety |
 | **Vite** | 7.2.2 | Build tool |
 | **Axios** | 1.13.2 | Requisições HTTP |
-| **Fastify** | — | Backend / Servidor HTTP |
-| **Prisma** | — | ORM / Acesso ao banco de dados |
+| **Fastify** | 5.1.0 | Backend / Servidor HTTP |
+| **Prisma** | 5.22.0 | ORM / Acesso ao banco de dados |
 
 ---
 ## Diretórios Principais
@@ -30,7 +30,7 @@ Esse é um sistema de uma pizzaria produzido em **TypeScript, utilizando Fastify
 - client: interface dos clientes 
 
 ---
-##Como Rodar?
+## Como Rodar?
 
 - Nas três pastas (sistema, adm, client) rodar:
 
