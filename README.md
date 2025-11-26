@@ -88,6 +88,42 @@ Interface responsável por receber pedidos dos clientes da pizzaria, sendo poss�
 Local que é responsável por rodar todo o servidor da api.
 
 ---
+## MongoDB
+
+O sistema utiliza o MongoDB como banco de dados NoSQL para armazenar clientes, produtos e pedidos. O modelo orientado a documentos permite registrar estruturas flexíveis, como listas de itens dentro de um pedido, facilitando o desenvolvimento e a evolução do sistema. A integração é feita por meio do Prisma, que simplifica o acesso ao banco e garante maior organização e consistência no código.
+
+---
+### Como Conectar?
+---
+- Este projeto utiliza o MongoDB Atlas (Free Tier) como banco de dados. Para conectar o sistema ao seu cluster, siga os passos abaixo:
+
+1. Crie uma conta no MongoDB Atlas
+- Acesse o site do MongoDB Atlas e crie uma conta gratuita.
+
+2. Crie um Cluster Free Tier
+
+3. Crie um usuário de acesso
+
+4. Libere acesso de IP
+
+- Vá em Network Access
+
+- Clique em Add IP Address
+
+- Se quiser acesso total enquanto desenvolve:
+Clique em Allow Access From Anywhere (0.0.0.0/0)
+
+5. Pegue sua connection string
+
+- o Atlas:
+- Vá em Connect
+- Escolha Connect your application
+
+- Copie a string que terá este formato:
+
+```mongodb+srv://SEU_USUARIO:SUA_SENHA@SEU_CLUSTER.mongodb.net/```
+
+---
 ## Autores
 
 Projeto desenvolvido por Ana Carolina Santos - RA: 2506285, Ekaterini Kotsis Milani - RA: 2510337, Isabeli Rosa de Medeiros - RA: 2503388 e Raul dos Santos Machado - RA: 2521975 para um trabalho do Curso de Ciências da Computação, da matéria Programação TypeScript ministrada pelo Eduardo Popovici.
